@@ -1,5 +1,6 @@
 package com.pluralsight.blog;
 
+import com.fasterxml.jackson.databind.ser.std.MapProperty;
 import com.pluralsight.blog.data.CategoryRepository;
 import com.pluralsight.blog.data.PostRepository;
 import com.pluralsight.blog.model.Category;
@@ -17,15 +18,35 @@ import java.util.Optional;
 public class BlogController {
 @Autowired
     private PostRepository postRepository;
+@Autowired
+private CategoryRepository categoryRepository;
 
-    public BlogController(PostRepository postRepository) {
+    public BlogController(PostRepository postRepository, CategoryRepository categoryRepository) {
         this.postRepository = postRepository;
+        this.categoryRepository = categoryRepository;
+    }
+
+    @RequestMapping("/category/{id}")
+    public String categoryList(@PathVariable Long id, ModelMap modelMap){
+        Category category =  categoryRepository.findById(id).orElse(null);
+        List<Post> posts = postRepository.findByCategory(category);
+        modelMap.put("Category",category );
+        modelMap.put("posts",posts );
+         return "category-list" ;
     }
 
     @RequestMapping("/")
+    public String findAllCategories(ModelMap modelMap) {
+        List<Category> categories =categoryRepository.findAll();
+        modelMap.put("categories", categories);
+        return "home";
+    }
+    @RequestMapping("/")
     public String listPosts(ModelMap modelMap) {
         List<Post> posts = postRepository.findAll();
+        List<Category> categories =categoryRepository.findAll();
         modelMap.put("posts", posts);
+        modelMap.put("categories", categories);
         return "home";
     }
 
