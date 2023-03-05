@@ -23,7 +23,7 @@ public class Post {
     private Date date;
 
 @ManyToOne
-    private Category category;
+    public Category category;
     public Post() {
         super();
     }
